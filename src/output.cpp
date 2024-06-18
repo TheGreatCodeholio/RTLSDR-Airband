@@ -351,10 +351,6 @@ static void close_if_necessary(channel_t* channel, file_data* fdata) {
         return;
     }
 
-    static const double MIN_TRANSMISSION_TIME_SEC = fdata->min_transmission_time_sec;
-    static const double MAX_TRANSMISSION_TIME_SEC = fdata->max_transmission_time_sec;
-    static const double MAX_TRANSMISSION_IDLE_SEC = fdata->max_transmission_idle_sec;
-
     timeval current_time;
     gettimeofday(&current_time, NULL);
 
@@ -362,7 +358,7 @@ static void close_if_necessary(channel_t* channel, file_data* fdata) {
         double duration_sec = delta_sec(&fdata->open_time, &current_time);
         double idle_sec = delta_sec(&fdata->last_write_time, &current_time);
 
-        if (duration_sec > MAX_TRANSMISSION_TIME_SEC || (duration_sec > MIN_TRANSMISSION_TIME_SEC && idle_sec > MAX_TRANSMISSION_IDLE_SEC)) {
+        if (duration_sec > fdata->max_transmission_time_sec || (duration_sec > fdata->min_transmission_time_sec && idle_sec > fdata->max_transmission_idle_sec)) {
             debug_print("closing file %s, duration %f sec, idle %f sec\n", fdata->file_path.c_str(), duration_sec, idle_sec);
             close_file(channel, fdata);
         }
