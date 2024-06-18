@@ -118,6 +118,24 @@ static int parse_outputs(libconfig::Setting& outs, channel_t* channel, int i, in
             fdata->include_freq = outs[o].exists("include_freq") ? (bool)(outs[o]["include_freq"]) : false;
             channel->need_mp3 = 1;
 
+            if(outs[o].exists("transmission_delay_sec")) {
+                fdata->max_transmission_idle_sec = outs[o]["transmission_delay_sec"];
+            } else {
+                fdata->max_transmission_idle_sec = 0.5;
+            }
+
+            if(outs[o].exists("minimum_transmission_sec")) {
+                fdata->min_transmission_time_sec = outs[o]["minimum_transmission_sec"];
+            } else {
+                fdata->min_transmission_time_sec = 0.5;
+            }
+
+            if(outs[o].exists("max_transmission_sec") && fdata->split_on_transmission) {
+                fdata->max_transmission_time_sec = outs[o]["max_transmission_sec"];
+            } else {
+                fdata->max_transmission_time_sec = 3600;
+            }
+
             if (fdata->split_on_transmission) {
                 if (parsing_mixers) {
                     cerr << "Configuration error: mixers.[" << i << "] outputs.[" << o << "]: split_on_transmission is not allowed for mixers\n";
